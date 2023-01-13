@@ -5,6 +5,7 @@ import { CreateBrandDto } from './dto/create-brand.dto';
 import { BrandRepository } from './model/brand.repository';
 import { Brand } from './model/brand.entity';
 import { ProductService } from '../product/product.service';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Injectable()
 export class BrandService {
@@ -38,5 +39,18 @@ export class BrandService {
     return this.brandRepository.find({
       relations: ['products']
     })
+  }
+
+  async updateBrand(
+    idBrand: number, 
+    updateBrandDto: UpdateBrandDto,
+  ) {
+    const brand = await this.findBrandById(idBrand);
+
+    await this.brandRepository.update(
+      brand.idBrand, { ...updateBrandDto }
+    )
+
+    return brand;
   }
 }
