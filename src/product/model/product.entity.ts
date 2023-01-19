@@ -1,6 +1,8 @@
 import { Brand } from 'src/brand/model/brand.entity';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Category } from '../../categories/model/category.entity';
+
 @Entity()
 export class Product {
     @PrimaryGeneratedColumn()
@@ -24,4 +26,8 @@ export class Product {
     @ManyToOne(() => Brand, brand => brand.products, { cascade: true })
     @JoinColumn({ name: 'idBrand' })
     brand: Brand;
+
+    @ManyToOne(() => Category, category => category.product)
+    @JoinColumn({ name: 'idCategory' })
+    category: Category;
 }

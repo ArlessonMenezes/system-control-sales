@@ -8,6 +8,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { IAddProduct } from './model/interface/add-product.interface';
 import { Product } from './model/product.entity';
 import { ProductRepository } from './model/product.repository';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductService {
@@ -15,6 +16,7 @@ export class ProductService {
     @InjectRepository(Product)
     private readonly productRepository: ProductRepository,
     private readonly brandService: BrandService,
+    private readonly categoriesService: CategoriesService,
   ){}
 
   async createProduct(createProduct: CreateProductDto) {
@@ -22,27 +24,33 @@ export class ProductService {
         numberRegister: createProduct.numberRegister 
     });
 
-    if (product) throw new BadRequestException('Product is already exists.');
+    if (product) throw new BadRequestException('Product already exists.');
 
     const brand = await this.brandService.findBrandById(createProduct.idBrand);
-    delete brand.products
+    delete brand.products;
+
+    const category = await this.categoriesService.getOneCategoryById(
+      createProduct.idCategory
+    );
+    delete category.product;
 
     const newProduct = this.productRepository.create(createProduct);
     newProduct.brand  = brand;
+    newProduct.category = category;
     
     return this.productRepository.save(newProduct);
   }
 
   async getAllProducts() {
     return this.productRepository.find({
-      relations: ['brand']
+      relations: ['brand', 'category']
     });
   }
 
   async findProductById(idProduct: number) {
     const product = await this.productRepository.findOne({
       where: { idProduct },
-      relations: ['brand']
+      relations: ['brand', 'category']
     });
 
     if (!product) throw new NotFoundException('Product not found.');

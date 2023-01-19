@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class CreateBrandDto {
-  @IsString()
+export class CreateCategoryDto {
   @IsNotEmpty()
+  @IsString()
   name: string;
 }
